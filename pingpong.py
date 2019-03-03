@@ -43,6 +43,8 @@ class Monitor:
         self.pong = 0
         self.conv = threading.Lock()
         self.data = threading.Lock()
+        self.sync_listener = threading.Lock()
+        self.sync_listener.acquire()
         self.m = 0
         self.ping_round = 0
         self.pong_round = 0
@@ -77,6 +79,8 @@ class Monitor:
 
     def listener(self):
         msg = 0
+        self.sync_listener.acquire()
+        time.sleep(1)
         statuss = MPI.Status()
         while True:
             msg = mpi_comm.recv(tag=MPI.ANY_TAG,status=statuss)
@@ -192,7 +196,7 @@ if __name__ == '__main__':
     btn.pack()
     btn2 = Button(ROOT, text="Zgub PONG",command= m.lost_pong)
     btn2.pack()
-    
+    m.sync_listener.release()
 
     while True:
         ROOT.update()
